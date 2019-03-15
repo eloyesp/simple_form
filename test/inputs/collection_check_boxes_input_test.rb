@@ -30,6 +30,30 @@ class CollectionCheckBoxesInputTest < ActionView::TestCase
     assert_no_select 'input[aria-required]'
   end
 
+  test 'collection input with check_boxes type properly sets checked values' do
+    @user.gender = ['male']
+
+    with_input_for @user, :gender, :check_boxes, collection: %i[male female]
+    assert_select 'input[type=checkbox][value=male][checked=checked]'
+    assert_select 'input[type=checkbox][value=female]'
+  end
+
+  test 'collection input with check_boxes type properly sets checked values using dates' do
+    @user.born_at = [Date.parse('2001-01-02')]
+
+    with_input_for @user, :born_at, :check_boxes, collection: [Date.parse('2001-01-01'), Date.parse('2001-01-02')]
+    assert_select 'input[type=checkbox][value="2001-01-01"]'
+    assert_select 'input[type=checkbox][value="2001-01-02"][checked=checked]'
+  end
+
+  test 'collection input with check_boxes type properly sets checked values using dates with to_date as value method' do
+    @user.born_at = [Date.parse('2001-01-02')]
+
+    with_input_for @user, :born_at, :check_boxes, collection: [Date.parse('2001-01-01'), Date.parse('2001-01-02')], value_method: :to_date
+    assert_select 'input[type=checkbox][value="2001-01-01"]'
+    assert_select 'input[type=checkbox][value="2001-01-02"][checked=checked]'
+  end
+
   test 'input does automatic collection translation for check_box types using defaults key' do
     store_translations(:en, simple_form: { options: { defaults: {
       gender: { male: 'Male', female: 'Female' }
